@@ -17,16 +17,20 @@ def extract_placemarks(kml_file):
         name = placemark.find('kml:name', namespace)
         coordinates = placemark.find('.//kml:coordinates', namespace)
         if name is not None and coordinates is not None:
-            result.append((name.text, coordinates.text.strip()))
+            coords = coordinates.text.strip().split(',')
+            if len(coords) >= 2:
+                latitude = coords[1]
+                longitude = coords[0]
+                result.append((name.text, latitude, longitude))
 
     return result
 
 def write_to_csv(placemarks, output_csv_path):
     with open(output_csv_path, mode='w', newline='') as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(['Name', 'Coordinates'])
-        for name, coords in placemarks:
-            writer.writerow([name, coords])
+        writer.writerow(['Location', 'Latitude', 'Longitude'])
+        for name, latitude, longitude in placemarks:
+            writer.writerow([name, latitude, longitude])
 
 def main():
     kml_location = input("Enter .kml location: ")
